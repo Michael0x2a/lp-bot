@@ -1,33 +1,80 @@
 from datetime import datetime
 
-import praw
+import praw  # type: ignore
 
-from crawler.models import Submission
-from utils.config import RedditInfo
+from database.schema import Submission, Comment
+from database.abstraction import Database
+
+from utils.config import RedditInfo, DatabaseInfo
 from utils.custom_types import HtmlStr, MarkdownStr
 
-def run(info: RedditInfo) -> None:
+def extract_submissions(reddit_info: RedditInfo, db_info: DatabaseInfo) -> None:
     # Read-only reddit instance
-    reddit = praw.Reddit(client_id=info.client_id,
-                         client_secret=info.client_secret,
-                         user_agent=info.user_agent)
+    reddit = praw.Reddit(client_id=reddit_info.client_id,
+                         client_secret=reddit_info.client_secret,
+                         user_agent=reddit_info.user_agent,
+                         username=reddit_info.username,
+                         password=reddit_info.password)
 
-    for submission in reddit.subreddit('learnprogramming').stream.submissions():
-        print(submission.title)
-        print(submission.author)
-        #print(submission.created_utc)
-        print(datetime.utcfromtimestamp(submission.created_utc))
-        #print(submission.fullname)
-        #print(submission.selftext)
-        #print(submission.selftext_html)
-        print(submission.url)
-        print()
+    # Database abstraction
+    db = Database(db_info)
 
-        '''Submission(
-                title=submission.title
-                author=submission.author
-                created_utc=datetime.utcfromtimestamp(submission.created_utc),
-                fullname=submission.fullname,
-                body_markdown=MarkdownStr(submission.selftext),
-                body_html=HtmlStr(submission.selftext_html),
-                url=submission.url)'''
+    for submission in reddit.subreddit('lptest').stream.submissions():
+        with db.commit_only_session() as session:
+            model = Submission(
+                    title=submission.title,
+                    author=submission.author.name,
+                    created_utc=datetime.utcfromtimestamp(submission.created_utc),
+                    fullname=submission.fullname,
+                    body_markdown=MarkdownStr(submission.selftext),
+                    body_html=HtmlStr(submission.selftext_html),
+                    url=submission.url)
+            
+            count = (session.query(Submission)
+                     .filter(Submission.fullname == model.fullname)
+                     .count())
+
+            if count == 0:
+                print('Submission')
+                print(model.title)
+                print(model.author)
+                print(model.created_utc)
+                print()
+
+                session.add(model)
+        
+def extract_comments(reddit_info: RedditInfo, db_info: DatabaseInfo) -> None:
+    # Read-only reddit instance
+    reddit = praw.Reddit(client_id=reddit_info.client_id,
+                         client_secret=reddit_info.client_secret,
+                         user_agent=reddit_info.user_agent,
+                         username=reddit_info.username,
+                         password=reddit_info.password)
+
+    # Database abstraction
+    db = Database(db_info)
+
+    for comment in reddit.subreddit('lptest').stream.comments():
+        with db.commit_only_session() as session:
+            model = Comment(
+                    author=comment.author.name,
+                    created_utc=datetime.utcfromtimestamp(comment.created_utc),
+                    fullname=comment.fullname,
+                    body_markdown=MarkdownStr(comment.body),
+                    body_html=HtmlStr(comment.body_html),
+                    url=comment.link_url,
+                    parent=comment.parent_id)
+            
+            count = (session.query(Comment)
+                     .filter(Submission.fullname == model.fullname)
+                     .count())
+
+            if count == 0:
+                print('Comment')
+                print(model.author)
+                print(model.created_utc)
+                print(model.url)
+                print()
+
+                session.add(model)
+

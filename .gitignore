@@ -1,6 +1,9 @@
 # Secret info 
 *.secret.*
 
+# Temporary/test database
+testdb.db
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
