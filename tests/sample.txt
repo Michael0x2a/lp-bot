@@ -1,0 +1,36 @@
+#include <iostream>
+#include <string>
+
+const int N=5;
+
+
+int main() 
+
+
+{
+
+	int I,J,A[N],T;
+	std::cout << "Enter Values" << std::endl;
+
+	for (I=0;I<N;I++)
+	std::cin >> A[I];
+	
+	for(I=0;I<N-1;I++)
+	for(J=I;J<N;J++)
+	if(A[I]>A[J]);
+	
+	{
+	T=A[I];
+	A[I]=A[J];
+	A[J]=T;
+	}
+	
+	std::cout << "Here are the sorted values" << std::endl;
+	for(I=0;I<N;I++)
+	std::cout << A[I] << std::endl;
+	
+}
+
+Sorry if I'm breaking any rules here, this is my first post, but I can't get the program to sort anything for me. There might be something glaringly obvious I'm missing but I can't figure it out. This is the code from my textbook.
+
+It said that I was exceeding Array Parameters so I changed the N-1 in (I=0;I<N-1;I++) to N-2 and the subsequent N to N-1 and it compiled, but still would not sort.
