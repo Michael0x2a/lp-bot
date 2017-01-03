@@ -17,6 +17,14 @@ class Submission(Base):
     body_html = Column(Text)
     url = Column(Text)
 
+    def debug(self) -> None:
+        print('Submission')
+        print(self.title)
+        print(self.author)
+        print(self.created_utc)
+        print(self.fullname)
+        print()
+
 class Comment(Base):
     __tablename__ = 'Comment'
 
@@ -28,4 +36,12 @@ class Comment(Base):
     body_html = Column(Text)
     url = Column(Text)
     parent = Column(Text)
+
+    def debug(self) -> None:
+        print('Comment')
+        print(self.parent)
+        print(self.author)
+        print(self.created_utc)
+        print(self.fullname)
+        print()
 

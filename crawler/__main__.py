@@ -7,7 +7,7 @@ from utils.config import read_config
 def main() -> None:
     config = read_config()
 
-    extracter_args = (config.reddit_info, config.database_info)
+    '''extracter_args = (config.reddit_info, config.database_info)
 
     submission_thread = Thread(
             target=extracter.extract_submissions,
@@ -22,7 +22,9 @@ def main() -> None:
     comment_thread.start()
 
     while True:
-        time.sleep(5)
+        time.sleep(5)'''
+
+    extracter.extract_info(config.subreddit_info, config.reddit_info, config.database_info)
 
 if __name__ == '__main__':
     main()

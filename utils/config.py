@@ -38,16 +38,27 @@ class RedditInfo:
                 username=check_is_str(blob['username']),
                 password=check_is_str(blob['password']))
 
+class SubredditInfo:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    @staticmethod
+    def make(blob: JsonDict) -> 'SubredditInfo':
+        return SubredditInfo(name=check_is_str(blob['name']))
+
 class Config:
     def __init__(self,
+            subreddit_info: SubredditInfo,
             reddit_info: RedditInfo,
             database_info: DatabaseInfo) -> None:
+        self.subreddit_info = subreddit_info
         self.reddit_info = reddit_info
         self.database_info = database_info
 
     @staticmethod
     def make(blob: JsonDict) -> 'Config':
         return Config(
+                SubredditInfo.make(check_is_json_dict(blob['subreddit_info'])),
                 RedditInfo.make(check_is_json_dict(blob['reddit_info'])),
                 DatabaseInfo.make(check_is_json_dict(blob['database_info'])))
 

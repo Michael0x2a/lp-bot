@@ -1,4 +1,7 @@
 {
+    "subreddit_info": {
+        "name": "learnprogramming"
+    },
     "reddit_info": {
         "client_id": "XXX",
         "client_secret": "XXX",
